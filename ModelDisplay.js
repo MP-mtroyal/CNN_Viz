@@ -13,48 +13,60 @@ class ModelDisplay{
         const modelName  = "tfjs_model.json";
         const model = await tf.loadLayersModel(serverPath + modelName);
         this.model = model;
+        
+        // Sub models for displaying activations
+        // Of form [[model, activationMap], ...]
+        this.models = [
+            [tf.model({
+                inputs: model.input,
+                outputs: model.getLayer('conv2d_Conv2D1').output
+            })], //Conv 1
+            [tf.model({
+                inputs: model.input,
+                outputs: model.getLayer('max_pooling2d_MaxPooling2D1').output
+            })], //MaxPool 1
+            [tf.model({
+                inputs: model.input,
+                outputs: model.getLayer('conv2d_Conv2D2').output
+            })], //Conv 2
+            [tf.model({
+                inputs: model.input,
+                outputs: model.getLayer('max_pooling2d_MaxPooling2D2').output
+            })] //MaxPool 2
+        ]
 
-        this.conv1 = tf.model({
-            inputs: model.input,
-            outputs: model.getLayer('conv2d_Conv2D1').output
-        });
-        this.conv2 = tf.model({
-            inputs: model.input,
-            outputs: model.getLayer('conv2d_Conv2D2').output
-        });
-        this.maxPool1 = tf.model({
-            inputs: model.input,
-            outputs: model.getLayer('max_pooling2d_MaxPooling2D1').output
-        });
-        this.maxPool2 = tf.model({
-            inputs: model.input,
-            outputs: model.getLayer('max_pooling2d_MaxPooling2D2').output
-        });
-
-        this.conv1Maps = new ActivationColumn(
-            this.conv1.outputs[0].shape, 
-            createVector(this.pos.x - 800, this.pos.y),
-            3
+        this.models[0].push(
+            new ActivationColumn(
+                this.models[0][0].outputs[0].shape, 
+                createVector(this.pos.x - 800, this.pos.y),
+                3
+            )
         );
-        this.max1Maps = new ActivationColumn(
-            this.maxPool1.outputs[0].shape, 
-            createVector(this.pos.x - 650, this.pos.y),
-            6
+        this.models[1].push(
+            new ActivationColumn(
+                this.models[1][0].outputs[0].shape, 
+                createVector(this.pos.x - 650, this.pos.y),
+                6
+            )
         );
-        this.conv2Maps = new ActivationColumn(
-            this.conv2.outputs[0].shape, 
-            createVector(this.pos.x - 400, this.pos.y - 25),
-            5
+        this.models[2].push(
+            new ActivationColumn(
+                this.models[2][0].outputs[0].shape, 
+                createVector(this.pos.x - 400, this.pos.y - 25),
+                5
+            )
         );
-        this.max2Maps = new ActivationColumn(
-            this.maxPool2.outputs[0].shape, 
-            createVector(this.pos.x - 300, this.pos.y - 25),
-            10
+        this.models[3].push(
+            new ActivationColumn(
+                this.models[3][0].outputs[0].shape, 
+                createVector(this.pos.x - 300, this.pos.y - 25),
+                10
+            )
         );
-
-        this.conv1Maps.connectLines(this.max1Maps);
-        this.conv2Maps.connectLines(this.max2Maps);
-        this.max1Maps.connectBeziers(this.conv2Maps, 1);
+        
+        this.models[0][1].connectLines(this.models[1][1])
+        this.models[2][1].connectLines(this.models[3][1])
+        this.models[1][1].connectBeziers(this.models[2][1])
 
         //dummy columns for connection beziers
         let drawPadDummy = new ActivationColumn(
@@ -65,14 +77,14 @@ class ModelDisplay{
             ),
             this.drawingPad.scale
         );
-        this.conv1Maps.connectBeziers(drawPadDummy, 1);
+        this.models[0][1].connectBeziers(drawPadDummy, 1);
 
         let indicatorDummy = new ActivationColumn(
             [null, 1, 1, 10],
             createVector(this.pos.x + this.size * 0.5, this.pos.y),
             this.size * 1.2
         );
-        this.max2Maps.connectBeziers(indicatorDummy, 1.0);
+        this.models[3][1].connectBeziers(indicatorDummy, 1.0);
 
         return model;
     }
@@ -84,31 +96,8 @@ class ModelDisplay{
             this.weights[i] = pred[i];
         }
         predTen.dispose();
-
-        let subModel, subMaps;
-        switch(this.counter % 4){
-            case 0: 
-                subModel = this.conv1;
-                subMaps  = this.conv1Maps;
-                break;
-            case 1: 
-                subModel = this.conv2;
-                subMaps  = this.conv2Maps;
-                break;
-            case 2: 
-                subModel = this.maxPool1;
-                subMaps  = this.max1Maps;
-                break;
-            case 3: 
-                subModel = this.maxPool2;
-                subMaps  = this.max2Maps;
-                break;
-            default: 
-                subModel = this.conv1;
-                subMaps  = this.conv1Maps;
-        }
-        const activations = subModel.predict(x);
-        subMaps.update(activations);
+        const activations = this.models[this.counter][0].predict(x);
+        this.models[this.counter][1].update(activations);
         activations.dispose();
     }
 
@@ -135,21 +124,7 @@ class ModelDisplay{
             currY += this.size * 1.5;
 
         }
-        switch(this.counter % 4){
-            case 0: this.conv1Maps.show(); 
-            case 0: this.conv2Maps.show(); 
-            case 0: this.max1Maps.show(); 
-            case 0: this.max2Maps.show(); 
-            default: this.conv1Maps.show(); 
-        }
+        this.models[this.counter][1].show()
         this.counter = (this.counter + 1) % 4;
-    }
-
-    async updateActMaps(maps, displays){
-        maps = maps.reshape([maps.shape[1], maps.shape[2], maps.shape[3]]);
-        maps = await maps.array();
-        for (let i=0; i<displays.length; i++){
-            displays[i].updateData(maps, i);
-        }
     }
 }
