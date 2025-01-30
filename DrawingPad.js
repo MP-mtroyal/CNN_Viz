@@ -62,7 +62,6 @@ class DrawingPad{
         if(y > this.pos.y + this.size.y * this.scale){return;}
         let xRel = (x - this.pos.x) / this.scale;
         let yRel = (y - this.pos.y) / this.scale;
-        //this.data[Math.floor(yRel)][Math.floor(xRel)] = 1;
 
         let leftBound  = Math.floor(yRel) - this.brushSize;
         let rightBound = Math.floor(yRel) + (this.brushSize + 1);

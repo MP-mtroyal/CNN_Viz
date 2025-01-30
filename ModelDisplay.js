@@ -109,7 +109,6 @@ class ModelDisplay{
         }
         const activations = subModel.predict(x);
         subMaps.update(activations);
-        //this.updateActMaps(activations, subMaps);
         activations.dispose();
     }
 
@@ -145,13 +144,7 @@ class ModelDisplay{
         }
         this.counter = (this.counter + 1) % 4;
     }
-/*
-    showActMaps(displays){
-        displays.forEach(display => {
-            display.show();
-        });
-    }
-*/
+
     async updateActMaps(maps, displays){
         maps = maps.reshape([maps.shape[1], maps.shape[2], maps.shape[3]]);
         maps = await maps.array();
@@ -160,17 +153,3 @@ class ModelDisplay{
         }
     }
 }
-
-/*
-function createActivationMaps(shape, pos, cellSize){
-    let actMaps = []
-    for (let n=0; n<shape[3]; n++){
-        let actMap = new ActivationDisplay(
-            createVector(pos.x, pos.y + n * shape[2] * cellSize * 1.25),
-            createVector(shape[1], shape[2]),
-            cellSize
-        );
-        actMaps.push(actMap);
-    }
-    return actMaps;
-}*/
