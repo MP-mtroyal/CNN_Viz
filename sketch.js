@@ -1,5 +1,4 @@
 
-
 //Model based on this TFjs tutorial
 //https://www.tensorflow.org/js/tutorials/training/handwritten_digit_cnn
 
@@ -13,7 +12,6 @@ let timer = 15;
 function setup(){
 	createCanvas(1400, 850);
 
-  let padWidth  = 250;
   let padHeight = 800 / 2 - 250 / 2;
   
   drawingPad = new DrawingPad(createVector(25, padHeight));
@@ -26,8 +24,7 @@ function setup(){
 }
 
 function draw(){
-  if (timer > 60){ // && timer % 15 == 0){
-    
+  if (timer > 60){ 
     modelPredict();
     drawingPad.show();
     modelDisplay.show();
