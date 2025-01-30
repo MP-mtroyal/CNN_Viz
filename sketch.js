@@ -14,8 +14,12 @@ function setup(){
 
   let padHeight = 800 / 2 - 250 / 2;
   
-  drawingPad = new DrawingPad(createVector(25, padHeight));
-  modelDisplay = new ModelDisplay(createVector(1400 - 150, 50), drawingPad);
+  drawingPad   = new DrawingPad(createVector(25, padHeight));
+  modelDisplay = new ModelDisplay(
+    createVector(1400 - 150, 50), 
+    drawingPad, 
+    "http://localhost:5500/"
+  );
   
   clearButton = createButton('Clear');
   clearButton.position(25, padHeight - 25);

@@ -1,18 +1,19 @@
 class ModelDisplay{
-    constructor(pos, drawingPad){
-        this.weights = [0.1, 0.5, 0.3, 0, 0.1, 0.2, 0, 0, 0.9, 0];
-        this.pos = createVector(pos.x, pos.y);
-        this.size = 48;
-        this.counter = 0;
+    constructor(pos, drawingPad, root){
+        this.weights    = [0.1, 0.5, 0.3, 0, 0.1, 0.2, 0, 0, 0.9, 0]; //Random initial Estimates
+        this.pos        = createVector(pos.x, pos.y);
+        this.size       = 48;
+        this.counter    = 0;
         this.drawingPad = drawingPad;
+        this.root       = root;
         this.loadModel();
     }
 
     async loadModel(){
-        const serverPath = "http://localhost:5500/";
+        const serverPath = this.root;
         const modelName  = "tfjs_model.json";
-        const model = await tf.loadLayersModel(serverPath + modelName);
-        this.model = model;
+        const model      = await tf.loadLayersModel(serverPath + modelName);
+        this.model       = model;
         
         // Sub models for displaying activations
         // Of form [[model, activationMap], ...]
@@ -20,19 +21,19 @@ class ModelDisplay{
             [tf.model({
                 inputs: model.input,
                 outputs: model.getLayer('conv2d_Conv2D1').output
-            })], //Conv 1
+            })], // [0] Conv 1
             [tf.model({
                 inputs: model.input,
                 outputs: model.getLayer('max_pooling2d_MaxPooling2D1').output
-            })], //MaxPool 1
+            })], // [1] MaxPool 1
             [tf.model({
                 inputs: model.input,
                 outputs: model.getLayer('conv2d_Conv2D2').output
-            })], //Conv 2
+            })], // [2] Conv 2
             [tf.model({
                 inputs: model.input,
                 outputs: model.getLayer('max_pooling2d_MaxPooling2D2').output
-            })] //MaxPool 2
+            })]  // [3] MaxPool 2
         ]
 
         this.models[0].push(
