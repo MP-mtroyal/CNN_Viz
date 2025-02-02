@@ -31,7 +31,9 @@ function draw(){
   if (timer > 60){ 
     modelPredict();
     drawingPad.show();
-    modelDisplay.show();
+    if (timer % 1 == 0){
+      modelDisplay.show();
+    }
   }
   timer++;
 }

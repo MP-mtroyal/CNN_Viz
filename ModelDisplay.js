@@ -2,7 +2,7 @@ class ModelDisplay{
     constructor(pos, drawingPad, root){
         this.weights    = [0.1, 0.5, 0.3, 0, 0.1, 0.2, 0, 0, 0.9, 0]; //Random initial Estimates
         this.pos        = createVector(pos.x, pos.y);
-        this.size       = 48;
+        this.size       = 42;
         this.counter    = 0;
         this.drawingPad = drawingPad;
         this.root       = root;
@@ -35,33 +35,34 @@ class ModelDisplay{
                 outputs: model.getLayer('max_pooling2d_MaxPooling2D2').output
             })]  // [3] MaxPool 2
         ]
-
+        let layer1Size = 2.5;
+        let layer2Size = 4;
         this.models[0].push(
             new ActivationColumn(
                 this.models[0][0].outputs[0].shape, 
                 createVector(this.pos.x - 800, this.pos.y),
-                3
+                layer1Size
             )
         );
         this.models[1].push(
             new ActivationColumn(
                 this.models[1][0].outputs[0].shape, 
                 createVector(this.pos.x - 650, this.pos.y),
-                6
+                layer1Size * 2
             )
         );
         this.models[2].push(
             new ActivationColumn(
                 this.models[2][0].outputs[0].shape, 
                 createVector(this.pos.x - 400, this.pos.y - 25),
-                5
+                layer2Size
             )
         );
         this.models[3].push(
             new ActivationColumn(
                 this.models[3][0].outputs[0].shape, 
                 createVector(this.pos.x - 300, this.pos.y - 25),
-                10
+                layer2Size * 2
             )
         );
         
@@ -102,7 +103,7 @@ class ModelDisplay{
         activations.dispose();
     }
 
-    show(){
+    async show(){
         let currY = this.pos.y;
         let numOffset = createVector(this.size * 0.23, this.size * 0.85);
 

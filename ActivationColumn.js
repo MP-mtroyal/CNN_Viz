@@ -4,6 +4,7 @@ class ActivationColumn{
         this.actMaps = [];
         this.beziers = [];
         this.lines   = [];
+        this.initalDraw = true;
         this.cellSize = cellSize;
         this.displaySize = shape[2] * cellSize;
         this.init(shape, pos, cellSize);
@@ -36,12 +37,15 @@ class ActivationColumn{
         this.lines.forEach(l => {
             l.show();
         });
-        stroke(0);
-        noFill();
-        strokeWeight(1);
-        this.beziers.forEach(b => {
-            bezier(b[0].x, b[0].y, b[1].x, b[1].y, b[2].x, b[2].y, b[3].x, b[3].y);
-        });
+        if (this.initalDraw){
+            stroke(0);
+            noFill();
+            strokeWeight(1);
+            this.beziers.forEach(b => {
+                bezier(b[0].x, b[0].y, b[1].x, b[1].y, b[2].x, b[2].y, b[3].x, b[3].y);
+            });
+            this.initalDraw = false;
+        }
         
         this.actMaps.forEach(actMap => {
             actMap.show();
